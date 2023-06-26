@@ -1,0 +1,21 @@
+<!-- template.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ABE Application</title>
+</head>
+
+<body>
+    <h1>ABE Application</h1>
+
+    <h2>Menu</h2>
+
+    <ol>
+        {% for entry in menu.entries %}
+        <li><a href="{{ entry.link }}">{{ entry.name }}</a></li>
+        {% endfor %}
+    </ol>
+</body>
+
+</html>

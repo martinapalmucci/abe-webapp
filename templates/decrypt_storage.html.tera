@@ -1,0 +1,27 @@
+<!-- show_dec_storage.html.tera -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Decrypted storage</title>
+</head>
+
+<body>
+    <h1>Decrypted storage</h1>
+
+    <p>Welcome <b>{{ user_id }}</b>!</p>
+
+    {% if storage_empty %}
+    <p>Storage is empty.</p>
+    {% else %}
+    <ol>
+        {% for data in storage_data %}
+        <li>Plaintext = {{ data }}</li>
+        {% endfor %}
+    </ol>
+    {% endif %}
+
+    <a href="/"> Go back to index</a>
+</body>
+
+</html>

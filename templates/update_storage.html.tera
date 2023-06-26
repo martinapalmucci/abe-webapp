@@ -1,0 +1,39 @@
+<!-- update_storage.html.tera -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Update storage</title>
+    <style>
+        .red-text {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Update storage</h1>
+
+    <h2>Enter new plaintext and policy</h2>
+
+    <form method="post" action="/update-storage">
+        <label for="plaintext">Plaintext:</label>
+        <input type="text" id="plaintext" name="plaintext">
+
+        <label for="policy">Policy:</label>
+        <input type="text" id="policy" name="policy">
+
+        <button type="submit">Add Entry</button>
+    </form>
+
+    {% if is_added %}
+    <p><span class="red-text">New entry has been added.</span></p>
+    <p>You can <a href="/"> go back to index</a> or add a new entry.</p>
+    {% else %}
+    <a href="/"> Go back to index</a>
+    {% endif %}
+
+
+</body>
+
+</html>

@@ -1,0 +1,25 @@
+<!-- enc_storage.html.tera -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Encrypted storage</title>
+</head>
+
+<body>
+    <h1>Encrypted storage</h1>
+
+    {% if storage_empty %}
+    <p>Storage is empty.</p>
+    {% else %}
+    <ol>
+        {% for data in storage_data %}
+        <li>Encrypted Entry -- Policy {{ data._policy.0 }}</li>
+        {% endfor %}
+    </ol>
+    {% endif %}
+
+    <a href="/"> Go back to index</a>
+</body>
+
+</html>

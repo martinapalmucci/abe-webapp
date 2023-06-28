@@ -100,11 +100,15 @@ impl Storage<Aw11Ciphertext> {
         res
     }
 
-    pub fn decrypt(&self, gk: &Aw11GlobalKey, sk: &Aw11SecretKey) -> Storage<Option<Vec<u8>>> {
+    pub fn decrypt(&self, gk: &Aw11GlobalKey, sk: &Aw11SecretKey) -> Storage<Option<String>> {
         let mut decrypted_data = Vec::new();
         for ct in self.data.iter() {
-            match decrypt(gk, sk, ct) {
-                Ok(plaintext) => decrypted_data.push(Some(plaintext)),
+            let boh = decrypt(gk, sk, ct);
+            match boh {
+                Ok(plaintext_bytes) => {
+                    let plaintext = String::from_utf8_lossy(&plaintext_bytes).into_owned();
+                    decrypted_data.push(Some(plaintext))
+                }
                 Err(_) => decrypted_data.push(None),
             }
         }

@@ -5,6 +5,8 @@ use rabe::schemes::aw11::{encrypt, Aw11Ciphertext, Aw11GlobalKey, Aw11PublicKey,
 use rabe::utils::policy::pest::PolicyLanguage;
 use rocket::data::ToByteUnit;
 use rocket::futures::io;
+use rocket::http::Status;
+use rocket::response::status;
 use rocket::Data;
 use rocket::{get, post, State};
 use rocket_dyn_templates::{context, Template};
@@ -13,30 +15,6 @@ use rocket_dyn_templates::{context, Template};
 pub fn new_action() -> Template {
     Template::render("new_action", context! {})
 }
-
-// #[post("/upload", format = "multipart", data = "<data>")]
-// pub async fn decrypt_storage_2(
-//     data: Data<'_>,
-//     config: &State<AppConfig>,
-// ) -> Result<Template, Box<dyn std::error::Error + Send + Sync>> {
-//     // Load variables
-
-//     let user_key = from_data_to_userkey(data).await?;
-
-//     let gk = Aw11GlobalKey::load_from_file(&config.gk_path).unwrap(); // Global key
-//     let storage = Storage::load_from_file(&config.storage_path).unwrap(); // Storage
-
-//     // Decrypt storage
-//     let dec_storage = storage.decrypt(&gk, &user_key);
-//     let temp = Template::render(
-//         "decrypt_storage",
-//         context! {user_id: user_key._gid, storage_data: dec_storage.get_data(), storage_empty: dec_storage.get_data().is_empty()},
-//     );
-//     Ok(temp)
-// }
-
-use rocket::http::Status;
-use rocket::response::status;
 
 #[post("/upload", format = "multipart", data = "<data>")]
 pub async fn decrypt_storage_2(

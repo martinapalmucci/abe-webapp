@@ -1,11 +1,79 @@
-use rabe::schemes::aw11::{encrypt, Aw11Ciphertext, Aw11GlobalKey, Aw11PublicKey, Aw11SecretKey};
-use rabe::utils::policy::pest::PolicyLanguage;
-use rocket::{get, post, State};
-use rocket_dyn_templates::{context, Template};
-
 use crate::app_config::AppConfig;
 use crate::storage::Storage;
 use crate::{get_filenames, Serializable};
+use rabe::schemes::aw11::{encrypt, Aw11Ciphertext, Aw11GlobalKey, Aw11PublicKey, Aw11SecretKey};
+use rabe::utils::policy::pest::PolicyLanguage;
+use rocket::data::ToByteUnit;
+use rocket::futures::io;
+use rocket::Data;
+use rocket::{get, post, State};
+use rocket_dyn_templates::{context, Template};
+
+#[get("/new-action")]
+pub fn new_action() -> Template {
+    Template::render("new_action", context! {})
+}
+
+// #[post("/upload", format = "multipart", data = "<data>")]
+// pub async fn decrypt_storage_2(
+//     data: Data<'_>,
+//     config: &State<AppConfig>,
+// ) -> Result<Template, Box<dyn std::error::Error + Send + Sync>> {
+//     // Load variables
+
+//     let user_key = from_data_to_userkey(data).await?;
+
+//     let gk = Aw11GlobalKey::load_from_file(&config.gk_path).unwrap(); // Global key
+//     let storage = Storage::load_from_file(&config.storage_path).unwrap(); // Storage
+
+//     // Decrypt storage
+//     let dec_storage = storage.decrypt(&gk, &user_key);
+//     let temp = Template::render(
+//         "decrypt_storage",
+//         context! {user_id: user_key._gid, storage_data: dec_storage.get_data(), storage_empty: dec_storage.get_data().is_empty()},
+//     );
+//     Ok(temp)
+// }
+
+use rocket::http::Status;
+use rocket::response::status;
+
+#[post("/upload", format = "multipart", data = "<data>")]
+pub async fn decrypt_storage_2(
+    data: Data<'_>,
+    config: &State<AppConfig>,
+) -> Result<Template, status::Custom<String>> {
+    let user_key = from_data_to_userkey(data)
+        .await
+        .map_err(|e| status::Custom(Status::InternalServerError, e.to_string()))?;
+
+    let gk = Aw11GlobalKey::load_from_file(&config.gk_path).unwrap(); // Global key
+    let storage = Storage::load_from_file(&config.storage_path).unwrap(); // Storage
+
+    // Decrypt storage
+    let dec_storage = storage.decrypt(&gk, &user_key);
+    let temp = Template::render(
+        "decrypt_storage",
+        context! {user_id: user_key._gid, storage_data: dec_storage.get_data(), storage_empty: dec_storage.get_data().is_empty()},
+    );
+    Ok(temp)
+}
+
+async fn from_data_to_userkey(file: Data<'_>) -> Result<Aw11SecretKey, Box<dyn std::error::Error>> {
+    let mut data = Vec::new();
+    file.open(256.kibibytes()).stream_to(&mut data).await?;
+
+    let data = String::from_utf8(data)?;
+    let lines: Vec<&str> = data.lines().collect();
+
+    let subline = lines
+        .get(4)
+        .ok_or_else(|| io::Error::new(io::ErrorKind::Other, "Invalid line"))?;
+    println!("subline = {:#?}", subline);
+
+    let userkey = serde_json::from_str(subline)?;
+    Ok(userkey)
+}
 
 /// Action: show encrypted storage
 #[get("/encrypted-storage")]
@@ -48,7 +116,6 @@ pub fn decrypt_storage(
 }
 
 // Action: update storage
-
 #[derive(rocket::FromForm)]
 pub struct FormPlaintextPolicy {
     pub plaintext: String,

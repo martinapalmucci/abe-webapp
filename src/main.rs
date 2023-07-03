@@ -34,6 +34,10 @@ fn index() -> Template {
                 name: "Update storage".to_string(),
                 link: "/get-plaintext-policy".to_string(),
             },
+            MenuItem {
+                name: "New action".to_string(),
+                link: "/new-action".to_string(),
+            },
         ],
     };
 
@@ -67,7 +71,9 @@ fn rocket() -> _ {
                 decrypt_storage,
                 show_encrypted_storage,
                 get_userkey,
-                get_plaintext_policy
+                get_plaintext_policy,
+                new_action,
+                decrypt_storage_2
             ],
         )
 }

@@ -1,24 +1,25 @@
-<!-- item_template.html.tera -->
 <!DOCTYPE html>
 <html>
 
 <head>
-    <title>Decrypt storage</title>
+    <title>File Explorer</title>
 </head>
 
 <body>
+
     <h1>Decrypt storage</h1>
 
     <h2>Enter your user-key</h2>
 
-    <form method="post" action="/decrypt-storage">
-        <label for="userkey_filename">User key:</label>
-        <input type="text" id="userkey_filename" name="userkey_filename">
+    <h3>File Explorer</h3>
 
-        <button type="submit">Add Key</button>
+    <form action="/decrypt-storage" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" />
+        <input type="submit" />
+    </form>
     </form>
 
-    <a href="/"> Go back to index</a>
+
 </body>
 
 </html>

@@ -28,15 +28,11 @@ fn index() -> Template {
             },
             MenuItem {
                 name: "Decrypt storage".to_string(),
-                link: "/get-user-key".to_string(),
+                link: "/get-userkey".to_string(),
             },
             MenuItem {
                 name: "Update storage".to_string(),
                 link: "/get-plaintext-policy".to_string(),
-            },
-            MenuItem {
-                name: "New action".to_string(),
-                link: "/new-action".to_string(),
             },
         ],
     };
@@ -50,7 +46,6 @@ fn rocket() -> _ {
     let config = AppConfig {
         gk_path: current_dir.to_owned() + "/src/keys/global_keys/global_parameters.json",
         auth_dir: current_dir.to_owned() + "/src/keys/authority_keys",
-        user_dir: current_dir.to_owned() + "/src/keys/user_keys",
         storage_path: current_dir.to_owned() + "/src/storage/storage.json",
     };
 
@@ -67,13 +62,11 @@ fn rocket() -> _ {
             "/",
             routes![
                 index,
-                update_storage,
-                decrypt_storage,
                 show_encrypted_storage,
                 get_userkey,
+                decrypt_storage,
                 get_plaintext_policy,
-                new_action,
-                decrypt_storage_2
+                update_storage,
             ],
         )
 }

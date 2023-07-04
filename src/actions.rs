@@ -11,13 +11,24 @@ use rocket::Data;
 use rocket::{get, post, State};
 use rocket_dyn_templates::{context, Template};
 
-#[get("/new-action")]
-pub fn new_action() -> Template {
-    Template::render("new_action", context! {})
+/// Action: show encrypted storage
+#[get("/encrypted-storage")]
+pub fn show_encrypted_storage(config: &State<AppConfig>) -> Template {
+    let storage: Storage<Aw11Ciphertext> = Storage::load_from_file(&config.storage_path).unwrap();
+    Template::render(
+        "encrypted_storage",
+        context! {storage_data: &storage.get_data(), storage_empty: storage.get_data().is_empty()},
+    )
 }
 
-#[post("/upload", format = "multipart", data = "<data>")]
-pub async fn decrypt_storage_2(
+/// Action: decrypt storage
+#[get("/get-userkey")]
+pub fn get_userkey() -> Template {
+    Template::render("get_userkey", context! {})
+}
+
+#[post("/decrypt-storage", format = "multipart", data = "<data>")]
+pub async fn decrypt_storage(
     data: Data<'_>,
     config: &State<AppConfig>,
 ) -> Result<Template, status::Custom<String>> {
@@ -47,50 +58,9 @@ async fn from_data_to_userkey(file: Data<'_>) -> Result<Aw11SecretKey, Box<dyn s
     let subline = lines
         .get(4)
         .ok_or_else(|| io::Error::new(io::ErrorKind::Other, "Invalid line"))?;
-    println!("subline = {:#?}", subline);
 
     let userkey = serde_json::from_str(subline)?;
     Ok(userkey)
-}
-
-/// Action: show encrypted storage
-#[get("/encrypted-storage")]
-pub fn show_encrypted_storage(config: &State<AppConfig>) -> Template {
-    let storage: Storage<Aw11Ciphertext> = Storage::load_from_file(&config.storage_path).unwrap();
-    Template::render(
-        "encrypted_storage",
-        context! {storage_data: &storage.get_data(), storage_empty: storage.get_data().is_empty()},
-    )
-}
-
-/// Action: decrypt storage
-#[derive(rocket::FromForm)]
-pub struct FormUserKey {
-    pub userkey_filename: String,
-}
-
-#[get("/get-user-key")]
-pub fn get_userkey() -> Template {
-    Template::render("get_userkey", context! {})
-}
-
-#[post("/decrypt-storage", data = "<form_data>")]
-pub fn decrypt_storage(
-    form_data: rocket::form::Form<FormUserKey>,
-    config: &State<AppConfig>,
-) -> Template {
-    // Load variables
-    let user_path = config.user_dir.to_owned() + "/" + &form_data.userkey_filename;
-    let user_key = Aw11SecretKey::load_from_file(&user_path).unwrap(); // User key
-    let gk = Aw11GlobalKey::load_from_file(&config.gk_path).unwrap(); // Global key
-    let storage = Storage::load_from_file(&config.storage_path).unwrap(); // Storage
-
-    // Decrypt storage
-    let dec_storage = storage.decrypt(&gk, &user_key);
-    Template::render(
-        "decrypt_storage",
-        context! {user_id: user_key._gid, storage_data: dec_storage.get_data(), storage_empty: dec_storage.get_data().is_empty()},
-    )
 }
 
 // Action: update storage

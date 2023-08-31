@@ -12,9 +12,9 @@
 </head>
 
 <body>
-    <h1>Update storage</h1>
+    <h2>Update storage</h2>
 
-    <h2>Enter new plaintext and policy</h2>
+    <h3>Enter new plaintext and policy</h3>
 
     <form method="post" action="/update-storage">
         <label for="plaintext">Plaintext:</label>

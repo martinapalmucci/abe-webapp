@@ -7,7 +7,7 @@
 </head>
 
 <body>
-    <h1>Decrypted storage</h1>
+    <h2>Decrypted storage</h2>
 
     <p>Welcome <b>{{ user_id }}</b>!</p>
 
